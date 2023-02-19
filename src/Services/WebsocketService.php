@@ -37,14 +37,14 @@ class WebsocketService implements MessageComponentInterface
         $project = $q->get('project');
 
         if(isset($this->handlers[$project])) {
-            if($this->handlers[$project]['handler'] === null) {
+            if(!isset($this->handlers[$project]['handler'])) {
                 $type = $this->handlers[$project]['type'];
                 $this->handlers[$project]['handler'] = new $type($this->channelManager,$this->handlers[$project]['routes']);
             }
         } else {
             $type = $this->handlers['default']['type'];
             $this->handlers[$project] = [
-                'routes'=>'default.php',
+                'routes'=>'client.php',
                 'type'=>$type,
                 'handler'=>null
             ];

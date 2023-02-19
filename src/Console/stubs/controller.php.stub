@@ -1,0 +1,15 @@
+<?php
+
+namespace DummyNamespace;
+
+use Etlok\Crux\WebSockets\WebSockets\Controllers\CruxWebSocketController;
+use Ratchet\ConnectionInterface;
+
+class DummyClass extends CruxWebSocketController
+{
+
+    public function some_method(ConnectionInterface $connection, Array $message)
+    {
+
+    }
+}
