@@ -1,7 +1,7 @@
 <?php
 namespace Etlok\Crux\WebSockets;
 
-use Etlok\Crux\Console\BuildWebSocketController;
+use Etlok\Crux\WebSockets\Console\BuildWebSocketController;
 use Etlok\Crux\WebSockets\Console\InstallCruxWebSockets;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;

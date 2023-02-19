@@ -11,18 +11,18 @@
   ],
   "autoload": {
     "psr-4": {
-      "Etlok\\Crux\\Redis\\": "src"
+      "Etlok\\Crux\\WebSockets\\": "src"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Etlok\\Crux\\Redis\\Tests\\": "tests"
+      "Etlok\\Crux\\WebSockets\\Tests\\": "tests"
     }
   },
   "extra": {
     "laravel": {
       "providers": [
-        "Etlok\\Crux\\Redis\\CruxRedisServiceProvider"
+        "Etlok\\Crux\\WebSockets\\CruxWebSocketsServiceProvider"
       ]
     }
   },

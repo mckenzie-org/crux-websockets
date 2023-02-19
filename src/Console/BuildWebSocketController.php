@@ -1,6 +1,6 @@
 <?php
 
-namespace Etlok\Crux\Console;
+namespace Etlok\Crux\WebSockets\Console;
 
 use Illuminate\Console\GeneratorCommand;
 
