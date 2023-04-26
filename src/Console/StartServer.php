@@ -89,8 +89,8 @@ class StartServer extends Command
     protected function configureManagers()
     {
         $this->laravel->singleton(ChannelManager::class, function () {
-            $mode = config('websockets.replication.mode', 'local');
-            $class = config("websockets.replication.modes.{$mode}.channel_manager");
+            $mode = config('crux_websockets.replication.mode', 'local');
+            $class = config("crux_websockets.replication.modes.{$mode}.channel_manager");
             return new $class($this->loop);
         });
     }

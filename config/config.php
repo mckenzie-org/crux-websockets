@@ -25,9 +25,11 @@ return [
     ],
     'replication'=>[
         'mode'=>'redis',
-        'redis'=>[
-            'channel_manager'=>\Etlok\Crux\WebSockets\ChannelManagers\RedisChannelManager::class,
-            'connection'=>'default'
+        'modes'=>[
+            'redis'=>[
+                'channel_manager'=>\Etlok\Crux\WebSockets\ChannelManagers\RedisChannelManager::class,
+                'connection'=>'default'
+            ]
         ]
     ],
     'ssl'=>[
