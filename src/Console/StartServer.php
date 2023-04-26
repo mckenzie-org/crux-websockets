@@ -4,7 +4,7 @@ namespace Etlok\Crux\WebSockets\Console;
 
 
 use Etlok\Crux\WebSockets\Contracts\ChannelManager;
-use Etlok\Crux\WebSockets\Facades\WebSocketRouter;
+use Etlok\Crux\WebSockets\Facades\WebSocketsRouter;
 use Etlok\Crux\WebSockets\Server\ServerFactory;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -118,7 +118,7 @@ class StartServer extends Command
      */
     protected function configureRoutes()
     {
-        WebSocketRouter::routes();
+        WebSocketsRouter::routes();
     }
 
     /**
@@ -196,7 +196,7 @@ class StartServer extends Command
 
         $this->server = $this->server
             ->setLoop($this->loop)
-            ->withRoutes(WebSocketRouter::getRoutes())
+            ->withRoutes(WebSocketsRouter::getRoutes())
             ->setConsoleOutput($this->output)
             ->createServer();
     }
