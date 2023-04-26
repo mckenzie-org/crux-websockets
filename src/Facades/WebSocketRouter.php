@@ -4,7 +4,7 @@ namespace Etlok\Crux\WebSockets\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
-class SocketRoute extends Facade {
+class WebSocketRouter extends Facade {
     /**
      * Get the registered name of the component.
      *
@@ -12,6 +12,6 @@ class SocketRoute extends Facade {
      */
     protected static function getFacadeAccessor()
     {
-        return 'websocket.route';
+        return 'websocket.router';
     }
 }

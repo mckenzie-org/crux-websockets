@@ -3,8 +3,15 @@ namespace Etlok\Crux\WebSockets;
 
 use Etlok\Crux\WebSockets\Console\BuildWebSocketController;
 use Etlok\Crux\WebSockets\Console\InstallCruxWebSockets;
+use Etlok\Crux\WebSockets\Console\StartServer;
+use Etlok\Crux\WebSockets\Server\Router;
+use Etlok\Crux\WebSockets\Services\WebsocketBroadcast;
+use Etlok\Crux\WebSockets\Services\WebsocketRoute;
+use Etlok\Crux\WebSockets\Services\WebsocketService;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use React\EventLoop\Loop;
+use React\EventLoop\LoopInterface;
 
 class CruxWebSocketsServiceProvider extends ServiceProvider
 {
@@ -15,9 +22,12 @@ class CruxWebSocketsServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        $this->registerFacades();
+
         if ($this->app->runningInConsole()) {
 
             $this->commands([
+                StartServer::class,
                 BuildWebSocketController::class,
                 InstallCruxWebSockets::class
             ]);
@@ -37,6 +47,26 @@ class CruxWebSocketsServiceProvider extends ServiceProvider
 
         Route::prefix(config('crux_websockets.web.prefix'))->middleware(config('crux_websockets.web.middleware'))->group(function() {
             $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        });
+
+    }
+
+    public function registerFacades()
+    {
+        $this->app->singleton(LoopInterface::class, function () {
+            return Loop::get();
+        });
+        $this->app->singleton('websockets.service', function () {
+            return app(config('crux_websockets.service'));
+        });
+        $this->app->singleton('websockets.router', function () {
+            return new Router;
+        });
+        $this->app->singleton('websockets.route', function () {
+            return new WebsocketRoute;
+        });
+        $this->app->singleton('websockets.broadcaster', function () {
+            return new WebsocketBroadcast;
         });
 
     }

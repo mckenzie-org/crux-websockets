@@ -12,6 +12,6 @@ class Broadcaster extends Facade {
      */
     protected static function getFacadeAccessor()
     {
-        return 'WebsocketBroadcast';
+        return 'websocket.broadcaster';
     }
 }

@@ -1,8 +1,10 @@
 <?php
 namespace Etlok\Crux\WebSockets\Services;
 
-use BeyondCode\LaravelWebSockets\QueryParameters;
-use BeyondCode\LaravelWebSockets\WebSockets\Channels\ChannelManager;
+use Etlok\Crux\WebSockets\Contracts\ChannelManager;
+use Etlok\Crux\WebSockets\Exceptions\ConnectionLimitExceeded;
+use Etlok\Crux\WebSockets\Exceptions\OriginNotAllowed;
+use Etlok\Crux\WebSockets\Server\QueryParameters;
 use Ratchet\ConnectionInterface;
 use Ratchet\RFC6455\Messaging\MessageInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
@@ -31,7 +33,9 @@ class WebsocketService implements MessageComponentInterface
     protected function verifyApp($connection) {
 
         $connection->app = new \stdClass();
-        $connection->app->id = 'cyclops';
+        $connection->app->id = config('crux_websockets.app_id');
+        $connection->app->allowedOrigins = config('crux_websockets.allowed_origins');
+        $connection->app->capacity = config('crux_websockets.capacity');
 
         $q = QueryParameters::create($connection->httpRequest);
         $project = $q->get('project');
@@ -76,24 +80,49 @@ class WebsocketService implements MessageComponentInterface
 
     public function onOpen(ConnectionInterface $connection)
     {
-        // TODO: Implement onOpen() method.
+        if (! $this->connectionCanBeMade($connection)) {
+            $connection->close();
+            return;
+        }
 
-        $this->verifyApp($connection)
-            ->generateSocketId($connection)
-            ->establishConnection($connection);
-        /*
-        $payload = new \stdClass();
-        $payload->channel = 'test';
-        $this->subscribe($connection, $payload);
-        */
+        try {
+            $this
+                ->verifyOrigin($connection)
+                ->limitConcurrentConnections($connection)
+                ->verifyApp($connection)
+                ->generateSocketId($connection)
+                ->establishConnection($connection);
+
+            $this->channelManager->subscribeToApp($connection->app->id);
+        } catch (\Exception $e) {
+            $connection->close();
+            /*
+            $connection->send(json_encode([
+                'status'=>1,
+                'author'=>$connection->app->project.':server',
+                'channel'=>$connection->app->entity,
+                'event' => 'error',
+                'messages'=>[
+                    [
+                        'type'=>self::MESSAGE_TYPE_ERROR,
+                        'title'=>$e->getMessage()
+                    ]
+                ],
+                'data' => []
+            ]));
+           */
+        }
 
     }
 
     public function onClose(ConnectionInterface $connection)
     {
         $this->handlers[$connection->app->project]['handler']->closeConnection($connection);
-        // TODO: Implement onClose() method.
-        $this->channelManager->removeFromAllChannels($connection);
+        $this->channelManager->unsubscribeFromAllChannels($connection)
+            ->then(function() use ($connection) {
+                $this->channelManager->unsubscribeFromApp($connection->app->id);
+            });
+
     }
 
     public function onError(ConnectionInterface $connection, \Exception $e)
@@ -112,15 +141,10 @@ class WebsocketService implements MessageComponentInterface
     }
     public function onMessage(ConnectionInterface $connection, MessageInterface $msg)
     {
-        // TODO: Implement onMessage() method.
-        //$channel = $this->channelManager->find($connection->app->id, 'test');
-        /*
-        optional($channel)->broadcast([
-            'status'=>0,
-            'event'=>'message_sent',
-            'message'=>'Message Sent'
-        ]);
-        */
+        if (! isset($connection->app)) {
+            return;
+        }
+
         if($this->verifyMessage($connection)) {
             $this->handlers[$connection->app->project]['handler']->handle($connection, $msg);
         } else {
@@ -138,6 +162,62 @@ class WebsocketService implements MessageComponentInterface
                 'data' => []
             ]));
         }
+    }
+
+    /**
+     * Verify the origin.
+     *
+     * @param  \Ratchet\ConnectionInterface  $connection
+     * @return $this
+     */
+    protected function verifyOrigin(ConnectionInterface $connection)
+    {
+        if (! $connection->app->allowedOrigins) {
+            return $this;
+        }
+
+        $header = (string) ($connection->httpRequest->getHeader('Origin')[0] ?? null);
+
+        $origin = parse_url($header, PHP_URL_HOST) ?: $header;
+
+        if (! $header || ! in_array($origin, $connection->app->allowedOrigins)) {
+            throw new OriginNotAllowed("App Origin Not Allowed",401);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Limit the connections count by the app.
+     *
+     * @param  \Ratchet\ConnectionInterface  $connection
+     * @return $this
+     */
+    protected function limitConcurrentConnections(ConnectionInterface $connection)
+    {
+        if (! is_null($capacity = $connection->app->capacity)) {
+            $this->channelManager
+                ->getGlobalConnectionsCount($connection->app->id)
+                ->then(function ($connectionsCount) use ($capacity, $connection) {
+                    if ($connectionsCount >= $capacity) {
+                        throw new ConnectionLimitExceeded("Connection Limit Exceeded",401);
+                    }
+                });
+        }
+
+        return $this;
+    }
+
+    /**
+     * Check if the connection can be made for the
+     * current server instance.
+     *
+     * @param  \Ratchet\ConnectionInterface  $connection
+     * @return bool
+     */
+    protected function connectionCanBeMade(ConnectionInterface $connection): bool
+    {
+        return $this->channelManager->acceptsNewConnections();
     }
 
     protected function subscribe(ConnectionInterface $connection, \stdClass $payload)

@@ -57,12 +57,12 @@ class MessageHandler
     {
         $channel_instance = $this->channelManager->find($connection->app->id, $channel);
         if($channel_instance) {
-            $channel_instance->broadcast(array_merge_recursive([
+            $channel_instance->broadcast($connection->app->id, (object) array_merge_recursive([
                 'status'=>0,
                 'event_type'=>'notification',
                 'author'=>$connection->app->project.':server',
                 'channel'=>$channel,
-            ],$payload));
+            ],$payload), true);
         }
     }
 

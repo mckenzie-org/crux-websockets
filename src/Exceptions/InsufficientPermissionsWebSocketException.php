@@ -1,6 +1,6 @@
 <?php
 
-namespace Etlok\Crux\WebSockets\Services\Exceptions;
+namespace Etlok\Crux\WebSockets\Exceptions;
 use Exception;
 
 class InsufficientPermissionsWebSocketException extends Exception {}

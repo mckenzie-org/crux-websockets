@@ -2,10 +2,10 @@
 
 namespace Etlok\Crux\WebSockets\Services;
 
-use App\Crux\Modules\WebSockets\Exceptions\BadWebSocketMethodException;
+use Etlok\Crux\WebSockets\Exceptions\BadWebSocketMethodException;
 use Illuminate\Support\Facades\App;
 
-class WebsocketRouter {
+class WebsocketRoute {
 
     protected $routes = [];
     protected $controllers = [];
