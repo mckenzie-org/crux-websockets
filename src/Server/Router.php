@@ -28,6 +28,16 @@ class Router
     }
 
     /**
+     * Register the default routes.
+     *
+     * @return void
+     */
+    public function routes()
+    {
+
+    }
+
+    /**
      * Add a GET route.
      *
      * @param  string  $uri
