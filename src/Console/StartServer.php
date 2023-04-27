@@ -5,6 +5,7 @@ namespace Etlok\Crux\WebSockets\Console;
 
 use Etlok\Crux\WebSockets\Contracts\ChannelManager;
 use Etlok\Crux\WebSockets\Facades\WebSocketsRouter;
+use Etlok\Crux\WebSockets\Server\Loggers\WebSocketsLogger;
 use Etlok\Crux\WebSockets\Server\ServerFactory;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -67,16 +68,12 @@ class StartServer extends Command
             return $this->loop;
         });
 
+        $this->configureMessageLogger();
         $this->configureManagers();
-
         $this->configureRestartTimer();
-
         $this->configureRoutes();
-
         $this->configurePcntlSignal();
-
         $this->configurePongTracker();
-
         $this->startServer();
     }
 
@@ -92,6 +89,20 @@ class StartServer extends Command
             $mode = config('crux_websockets.replication.mode', 'local');
             $class = config("crux_websockets.replication.modes.{$mode}.channel_manager");
             return new $class($this->loop);
+        });
+    }
+
+    /**
+     * Configure the logger for messages.
+     *
+     * @return void
+     */
+    protected function configureMessageLogger()
+    {
+        $this->laravel->singleton(WebSocketsLogger::class, function () {
+            return (new WebSocketsLogger($this->output))
+                ->enable($this->option('debug') ?: config('app.debug'))
+                ->verbose($this->output->isVerbose());
         });
     }
 

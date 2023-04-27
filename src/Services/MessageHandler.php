@@ -2,9 +2,9 @@
 
 namespace Etlok\Crux\WebSockets\Services;
 
-use App\Crux\Modules\WebSockets\Exceptions\BadWebSocketMethodException;
-use App\Crux\Modules\WebSockets\Exceptions\UnAuthenticatedWebSocketCallException;
-use App\Crux\Modules\WebSockets\Facades\SocketRoute;
+use Etlok\Crux\WebSockets\Facades\SocketRoute;
+use Etlok\Crux\WebSockets\Exceptions\UnAuthenticatedWebSocketCallException;
+use Etlok\Crux\WebSockets\Exceptions\BadWebSocketMethodException;
 use Exception;
 use Ratchet\ConnectionInterface;
 use Ratchet\RFC6455\Messaging\MessageInterface;
