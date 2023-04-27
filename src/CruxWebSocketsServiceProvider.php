@@ -63,7 +63,7 @@ class CruxWebSocketsServiceProvider extends ServiceProvider
             $channel_manager = config("crux_websockets.replication.modes.{$mode}.channel_manager");
 
             return ($channel_manager ?? null) !== null && class_exists($channel_manager)
-                ? app($channel_manager) : new LocalChannelManager();
+                ? app($channel_manager) : app(LocalChannelManager::class);
         });
         $this->app->singleton('websockets.service', function () {
             return app(config('crux_websockets.service'));
