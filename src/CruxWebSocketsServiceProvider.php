@@ -1,9 +1,11 @@
 <?php
 namespace Etlok\Crux\WebSockets;
 
+use Etlok\Crux\WebSockets\ChannelManagers\LocalChannelManager;
 use Etlok\Crux\WebSockets\Console\BuildWebSocketController;
 use Etlok\Crux\WebSockets\Console\InstallCruxWebSockets;
 use Etlok\Crux\WebSockets\Console\StartServer;
+use Etlok\Crux\WebSockets\Contracts\ChannelManager;
 use Etlok\Crux\WebSockets\Server\Router;
 use Etlok\Crux\WebSockets\Services\WebsocketBroadcast;
 use Etlok\Crux\WebSockets\Services\WebsocketRoute;
@@ -55,6 +57,13 @@ class CruxWebSocketsServiceProvider extends ServiceProvider
     {
         $this->app->singleton(LoopInterface::class, function () {
             return Loop::get();
+        });
+        $this->app->singleton(ChannelManager::class, function ($app) {
+            $mode = config('crux_websockets.replication.mode');
+            $channel_manager = config("crux_websockets.replication.modes.{$mode}.channel_manager");
+
+            return ($channel_manager ?? null) !== null && class_exists($channel_manager)
+                ? app($channel_manager) : new LocalChannelManager();
         });
         $this->app->singleton('websockets.service', function () {
             return app(config('crux_websockets.service'));
