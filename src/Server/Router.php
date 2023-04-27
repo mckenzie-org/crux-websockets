@@ -97,7 +97,7 @@ class Router
             throw InvalidWebsocketHandlerException("WebSocket Handler Not Found",404);
         }
 
-        $this->routes->get($uri, $action);
+        $this->get($uri, $action);
     }
 
     /**

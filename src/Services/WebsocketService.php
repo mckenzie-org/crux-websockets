@@ -5,6 +5,7 @@ use Etlok\Crux\WebSockets\Contracts\ChannelManager;
 use Etlok\Crux\WebSockets\Exceptions\ConnectionLimitExceeded;
 use Etlok\Crux\WebSockets\Exceptions\OriginNotAllowed;
 use Etlok\Crux\WebSockets\Server\QueryParameters;
+use Illuminate\Support\Facades\Log;
 use Ratchet\ConnectionInterface;
 use Ratchet\RFC6455\Messaging\MessageInterface;
 use Ratchet\WebSocket\MessageComponentInterface;
@@ -87,14 +88,15 @@ class WebsocketService implements MessageComponentInterface
 
         try {
             $this
+                ->verifyApp($connection)
                 ->verifyOrigin($connection)
                 ->limitConcurrentConnections($connection)
-                ->verifyApp($connection)
                 ->generateSocketId($connection)
                 ->establishConnection($connection);
 
             $this->channelManager->subscribeToApp($connection->app->id);
         } catch (\Exception $e) {
+            Log::info($e->getMessage());
             $connection->close();
             /*
             $connection->send(json_encode([
