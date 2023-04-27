@@ -28,6 +28,16 @@ class Router
     }
 
     /**
+     * Get the routes.
+     *
+     * @return \Symfony\Component\Routing\RouteCollection
+     */
+    public function getRoutes(): RouteCollection
+    {
+        return $this->routes;
+    }
+
+    /**
      * Register the default routes.
      *
      * @return void
