@@ -47,13 +47,6 @@ class Router
 
     }
 
-    /**
-     * Add a GET route.
-     *
-     * @param  string  $uri
-     * @param  string  $action
-     * @return void
-     */
     public function get(string $uri, $action)
     {
         $this->addRoute('GET', $uri, $action);
@@ -94,7 +87,7 @@ class Router
     public function webSocket(string $uri, $action)
     {
         if (! is_subclass_of($action, MessageComponentInterface::class)) {
-            throw InvalidWebsocketHandlerException("WebSocket Handler Not Found",404);
+            throw new InvalidWebsocketHandlerException("WebSocket Handler Not Found",404);
         }
 
         $this->get($uri, $action);
