@@ -190,10 +190,6 @@ class StartServer extends Command
             $this->option('host'), $this->option('port')
         );
 
-        if ($loop = $this->option('loop')) {
-            $this->loop = $loop;
-        }
-
         $this->server = $this->server
             ->setLoop($this->loop)
             ->withRoutes(WebSocketsRouter::getRoutes())
