@@ -12,6 +12,6 @@ class SocketRoute extends Facade {
      */
     protected static function getFacadeAccessor()
     {
-        return 'websocket.route';
+        return 'websockets.route';
     }
 }
