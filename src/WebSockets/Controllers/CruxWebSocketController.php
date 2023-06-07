@@ -2,8 +2,8 @@
 
 
 namespace Etlok\Crux\WebSockets\WebSockets\Controllers;
-use App\Crux\Modules\WebSockets\Exceptions\BadWebSocketMethodException;
-use App\Crux\Modules\WebSockets\Exceptions\InvalidDataWebSocketException;
+use Etlok\Crux\WebSockets\Exceptions\BadWebSocketMethodException;
+use Etlok\Crux\WebSockets\Exceptions\InvalidDataWebSocketException;
 use Ratchet\ConnectionInterface;
 
 class CruxWebSocketController {
