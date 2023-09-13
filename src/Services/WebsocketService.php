@@ -22,7 +22,7 @@ class WebsocketService implements MessageComponentInterface
     {
         $this->handlers = config('crux_websockets.handlers');
         $this->channelManager = $channelManager;
-        //$this->messageHandler = new MessageHandler($this->channelManager);
+        //TODO: For each handler call the init function.
     }
 
     protected function generateSocketId($connection) {
